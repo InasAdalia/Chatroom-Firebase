@@ -1,0 +1,25 @@
+<!-- first text -->
+<div class="row chat-div inc-profile">
+<!-- profile pic -->
+<p class="col-2 text-end profile-">
+    <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp" alt="avatar 1" style="width:40px">
+</p>
+
+<!-- username, message and timestamp -->
+<div class="col">
+    <p class="fw-bold">Inas<span class=" text-muted fw-normal text-end ms-2 timestamp">23 Jan, 11:00pm</span></p>
+    <p>I have landed</p>
+</div>
+</div>
+
+<!-- following text -->
+<div class="row chat-div">
+<p class="col-2 timestamp text-muted text-end align-self-center" >11:00pm</p>
+<p class="col me-2">Hello</p>
+</div>
+
+<!-- following text -->
+<div class="row chat-div">
+<p class="col-2 timestamp text-muted text-end align-self-center">11:00pm</p>
+<p class="span-col col   me-2">chat, am I cooked</p>
+</div>
