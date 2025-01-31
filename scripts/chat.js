@@ -8,6 +8,10 @@ class Chatroom{
         this.chatCol = collection(db, 'chats')
     }
 
+    setUsername=(username)=>{
+        this.username=username
+    }
+
     addChat = async(message, username)=>{ //will add new chat message into fb chats collection
 
         //preparing th js object to be added

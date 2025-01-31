@@ -10,10 +10,16 @@ const setupUI = ()=>{
     activeRoom.realtimeListener((chats) => renderChats(chats));
 
     //update username
-    const username = document.querySelector('.username');
-    username.textContent += activeRoom
+    // const username = document.querySelector('.username');
+    // username.textContent = localStorage.getItem('username'); 
     // username.textContent = activeRoom.getByRoom('username');
 
+    const updateUsernameDisplay= (activeRoom) =>{
+        const username = localStorage.getItem('username');
+        document.querySelector('.username').textContent = username;
+        activeRoom.setUsername(username);
+    }
+    updateUsernameDisplay(activeRoom);
     //chatroom buttons listener
     const roomBtns = document.querySelector('.chat-rooms').querySelectorAll('.btn');
     roomBtns.forEach(roomBtn=>{
@@ -54,6 +60,8 @@ const setupUI = ()=>{
     //render chat ui
     const renderChats=(chats)=>{
 
+        updateUsernameDisplay(activeRoom);
+
         let curPointer;
         let prevPointer=null;
         const chatContent = document.querySelector('.chat-content');
@@ -62,19 +70,33 @@ const setupUI = ()=>{
 
         chats.forEach(chat=>{
             curPointer = chat;
-            // chatContent.innerHTML = ``;
+
+            //formatting timestamp to "22 January 2025"
+            const dateOnly = chat.sent_at?.toDate().toLocaleDateString("en-US", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+            });
+
+            //formatting timestamp to "11:02pm" 
+            const timeOnly = chat.sent_at?.toDate().toLocaleTimeString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true,
+            });
+            
+            //add divider if new day but not if prevPointer is null.
+            if(prevPointer==null || prevPointer!= null && prevPointer.sent_at?.toDate().toDateString() !== chat.sent_at?.toDate().toDateString()){
+                chatContent.innerHTML += `
+                    <div class="divider d-flex align-items-center mb-1 align-self-center ">
+                        <p class="text-center small mx-3 mb-0 text-muted">${dateOnly}</p>
+                    </div>
+
+            `
+                prevPointer=null;
+            }
 
             if(prevPointer===null || prevPointer.username !== chat.username){
-
-                //formatting timestamp to "22 January 2025 11:02pm"
-                const fullDateTime = chat.sent_at?.toDate().toLocaleString("en-US", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: true,
-                });
 
                 //generate first-text template
                 chatContent.innerHTML += `
@@ -87,19 +109,12 @@ const setupUI = ()=>{
 
                     <!-- username, message and timestamp -->
                     <div class="col">
-                        <p class="fw-bold">${chat.username}<span class=" text-muted fw-normal text-end ms-2 timestamp">${fullDateTime}</span></p>
+                        <p class="fw-bold">${chat.username}<span class=" text-muted fw-normal text-end ms-2 timestamp">${timeOnly}</span></p>
                         <p>${chat.message}</p>
                     </div>
                 </div>`
                 
             } else {
-
-                //formatting timestamp to "11:02pm" 
-                const timeOnly = chat.sent_at?.toDate().toLocaleTimeString("en-US", {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: true,
-                });
 
                 //generate next-text template
                 chatContent.innerHTML += `
@@ -149,9 +164,10 @@ const setupUI = ()=>{
     updateName.addEventListener('submit', e=>{
         e.preventDefault();
 
-        console.log("to be updated: " + document.querySelector('.username').textContent)
+        console.log("old username: " + document.querySelector('.username').textContent)
         activeRoom.updateName(document.querySelector('.username').textContent, document.querySelector('#name').value);
-        username.textContent = document.querySelector('#name').value
+        localStorage.setItem('username', document.querySelector('#name').value);
+        updateUsernameDisplay(activeRoom);
         updateName.reset();
     })
 
