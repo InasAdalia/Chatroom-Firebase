@@ -1,26 +1,31 @@
 import { generalChatroom, gamingChatroom, musicChatroom, ninjasChatroom } from "./chat";
 
-const setupUI = ()=>{
+const setupUI = () => {
 
     
     let activeRoom = generalChatroom;
     let clickedRoom;
 
-    //open ui of generalChatroom by default
-    activeRoom.realtimeListener((chats) => renderChats(chats));
+    let unsubscribe; // Store the current listener
 
-    //update username
-    // const username = document.querySelector('.username');
-    // username.textContent = localStorage.getItem('username'); 
-    // username.textContent = activeRoom.getByRoom('username');
+    const setupChatListener = (activeRoom) => {
+        if (unsubscribe) {
+            unsubscribe(); // Stop previous listener
+        }
+        unsubscribe = activeRoom.realtimeListener((chats) => renderChats(chats));
+    };
+    
+    setupChatListener(activeRoom);
 
+    //updates username display on top of page
     const updateUsernameDisplay= (activeRoom) =>{
         const username = localStorage.getItem('username');
         document.querySelector('.username').textContent = username;
         activeRoom.setUsername(username);
     }
     updateUsernameDisplay(activeRoom);
-    //chatroom buttons listener
+
+    //chatroom selection buttons listener
     const roomBtns = document.querySelector('.chat-rooms').querySelectorAll('.btn');
     roomBtns.forEach(roomBtn=>{
         roomBtn.addEventListener('click',e=>{
@@ -51,8 +56,9 @@ const setupUI = ()=>{
             console.log(activeRoom);
 
 
-            //setup realtime listener to render chat
-            activeRoom.realtimeListener((chats) => renderChats(chats));
+            // //setup realtime listener to render chat
+            // activeRoom.realtimeListener((chats) => renderChats(chats));
+            setupChatListener(activeRoom);
             console.log('chats fetched')
         })
     })
@@ -91,8 +97,7 @@ const setupUI = ()=>{
                     <div class="divider d-flex align-items-center mb-1 align-self-center ">
                         <p class="text-center small mx-3 mb-0 text-muted">${dateOnly}</p>
                     </div>
-
-            `
+                `
                 prevPointer=null;
             }
 
@@ -125,8 +130,8 @@ const setupUI = ()=>{
                 `
             }
             prevPointer = curPointer;
-
-        })
+            
+            })
 
         //setup hover effect
         chatContent.querySelectorAll('.chat-div-2').forEach(chatDiv=>{
@@ -144,9 +149,14 @@ const setupUI = ()=>{
                 }
             });
         })
+
+        //auto scroll to bottom of chat
+        setTimeout(() => {
+            document.querySelector('.card').scrollTop = chatContent.scrollHeight;
+          }, 1);
     }
 
-    //send message
+    //send message form
     const sendChat = document.querySelector('.new-chat');
     sendChat.addEventListener('submit', e=>{
         e.preventDefault();
@@ -159,7 +169,7 @@ const setupUI = ()=>{
     })
 
 
-    //update name
+    //update name form
     const updateName = document.querySelector('.new-name');
     updateName.addEventListener('submit', e=>{
         e.preventDefault();
@@ -173,6 +183,5 @@ const setupUI = ()=>{
 
 
 }
-
 
 export {setupUI}
